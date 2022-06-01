@@ -1,0 +1,12 @@
+{
+  "name": "mastering-async-flow",
+  "version": "1.0.0",
+  "description": "A workshop part of the JS Conf Budapest 2022, hosted by EXADEL",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
