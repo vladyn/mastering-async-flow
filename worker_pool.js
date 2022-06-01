@@ -45,7 +45,7 @@ class WorkerPool extends EventEmitter {
         })
 
         worker.on('message', (result) => {
-            worker[taskInfo] && worker[taskInfo].done(null, result)
+            worker[taskInfo].done(null, result)
             worker[taskInfo] = null
             this.freeWorkers.push(worker)
             this.emit(workerFeedEvent)

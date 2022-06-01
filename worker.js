@@ -1,6 +1,4 @@
-const { threadId, workerData, parentPort } = require('worker_threads');
-
-parentPort.postMessage({ message: workerData})
+const { threadId, parentPort } = require('worker_threads');
 
 parentPort.on('message', task => {
     const { value } = task;
