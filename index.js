@@ -1,9 +1,10 @@
-const { Worker, isMainThread, workerData } = require('worker_threads');
+const { Worker, isMainThread } = require('worker_threads');
 
 function runService(workerData) {
     return new Promise((resolve, reject) => {
         if (isMainThread) {
             const worker = new Worker('./script.js', workerData)
+
             worker.on('error', reject)
 
             worker.on('exit', code => {
@@ -13,6 +14,7 @@ function runService(workerData) {
             })
 
             worker.on('message', resolve)
+
         } else {
             console.log(workerData);
         }
