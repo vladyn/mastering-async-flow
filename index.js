@@ -1,33 +1,26 @@
-const { Worker, isMainThread } = require('worker_threads');
+const WorkerPool = require('./worker_pool')
+const path = require('path')
+const os = require('os')
+const koa = require('koa')
 
-function runService(workerData) {
-    return new Promise((resolve, reject) => {
-        if (isMainThread) {
-            const worker = new Worker('./script.js', workerData)
+const pool = new WorkerPool(os.cpus().length, path.resolve(__dirname, 'worker.js'))
+console.log('Kernels: ', os.cpus().length)
 
-            worker.on('error', reject)
 
-            worker.on('exit', code => {
-                if (code !== 0) {
-                    reject(new Error( `Error ${code}`))
-                }
-            })
+const app = new koa()
 
-            worker.on('message', resolve)
+app.use( async context => {
+    const { value } = context.query
+    context.body = await new Promise((resolve, reject) => {
+        pool.runTask({ value }, (error, result) => {
+            if (error) {
+                return reject(error)
+            }
 
-        } else {
-            console.log(workerData);
-        }
-    })
-}
+            return resolve(result)
+        })
+    });
+    context.status = 200;
+})
 
-const run = async () => {
-    const result = await runService({ workerData: 'Hello from the main thread' })
-    console.log(result)
-}
-
-run().catch(error => console.log(error));
-
-// runService(workerData)
-//     .then(res => console.log(res))
-//     .catch(err => console.log(err))
+app.listen({ port: 3000})

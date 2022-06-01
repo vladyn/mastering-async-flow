@@ -1,6 +1,7 @@
-const { Worker } = require('worker_threads');
+const { Worker } = require('worker_threads')
 const { AsyncResource } = require('async_hooks')
 const { EventEmitter } = require('events')
+const path = require('path')
 
 const taskInfo = Symbol('taskInfo')
 const workerFeedEvent = Symbol('workerFeedEvent')
@@ -25,13 +26,13 @@ class WorkerPool extends EventEmitter {
         this.workers = []
         this.freeWorkers = []
 
-        for (let i = 0; i < numsThreads; i++) {
+        for (let i = 0; i < this.numsThreads; i++) {
             this.addWorker()
         }
     }
 
     addWorker() {
-        const worker = new Worker(path.resolve(this.workerFile), {})
+        const worker = new Worker(path.resolve(this.workerFile))
         worker.on('error', err => {
             if(worker[taskInfo]) {
                 worker[taskInfo].done(err, null)
@@ -44,7 +45,7 @@ class WorkerPool extends EventEmitter {
         })
 
         worker.on('message', (result) => {
-            worker[taskInfo].done(null, result)
+            worker[taskInfo] && worker[taskInfo].done(null, result)
             worker[taskInfo] = null
             this.freeWorkers.push(worker)
             this.emit(workerFeedEvent)
@@ -70,3 +71,5 @@ class WorkerPool extends EventEmitter {
         this.workers.forEach(worker => worker.terminate())
     }
 }
+
+module.exports = WorkerPool;
