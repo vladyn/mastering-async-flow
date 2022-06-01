@@ -13,6 +13,7 @@ app.use( async context => {
     const { value } = context.query
     context.body = await new Promise((resolve, reject) => {
         pool.runTask({ value }, (error, result) => {
+            console.log('inside pool task', error, result)
             if (error) {
                 return reject(error)
             }
